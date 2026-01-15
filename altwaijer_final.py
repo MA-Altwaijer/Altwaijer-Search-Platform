@@ -58,4 +58,4 @@ if search_query:
                 if t_ref and l_ref: st.session_state.library.append({"العنوان": t_ref, "الرابط": l_ref, "التاريخ": datetime.now().strftime("%Y-%m-%d")}); st.rerun()
         with c4: 
             if st.session_state.library: st.dataframe(pd.DataFrame(st.session_state.library))
-                st.markdown("<p style='text-align: center; color: gray;'>M.A. Altwaijer 2026 - الإصدار المستقر</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; color: gray;'>M.A. Altwaijer 2026 - الإصدار المستقر</p>", unsafe_allow_html=True)
