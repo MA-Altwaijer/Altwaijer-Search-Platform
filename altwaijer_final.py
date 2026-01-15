@@ -2,23 +2,20 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# 1. إعدادات البوابة الأكاديمية
-st.set_page_config(page_title="بوابة M.A. Altwaijer الأكاديمية", layout="wide")
+# 1. إعدادات الهوية الأكاديمية
+st.set_page_config(page_title="بوابة M.A. Altwaijer", layout="wide")
 
-# حفظ البيانات (القاموس والمكتبة)
 if 'dictionary' not in st.session_state:
     st.session_state.dictionary = {"النبر": "Word Stress", "التنغيم": "Intonation"}
 if 'library' not in st.session_state:
     st.session_state.library = []
 
-st.markdown("<h1 style='text-align: center; color: #0e1133;'>🎓 بوابة M.A. Altwaijer للبحث الأكاديمي</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #0e1133;'>🎓 بوابة M.A. Altwaijer للاستقصاء العلمي</h1>", unsafe_allow_html=True)
 
-# 2. منطقة البحث المركزية
-search_query = st.text_input("🔍 أدخل موضوع البحث الاستقصائي:", placeholder="اكتب موضوعك هنا...")
+# 2. منطقة البحث
+search_query = st.text_input("🔍 أدخل موضوع البحث:", placeholder="مثلاً: التنغيم في اللغة العربية...")
 
 if search_query:
-    st.markdown("---")
-    
     # الروابط المستخلصة من صوركِ الناجحة
     u_scholar = f"https://scholar.google.com/scholar?q={search_query}"
     u_semantic = f"https://www.semanticscholar.org/search?q={search_query}"
@@ -26,53 +23,39 @@ if search_query:
     u_mit = f"https://dspace.mit.edu/discover?query={search_query}"
     u_oatd = f"https://oatd.org/oatd/search?q={search_query}"
 
-    col_global, col_arabic = st.columns(2)
+    col_g, col_a = st.columns(2)
+    with col_g:
+        st.markdown("### 🌐 الجناح العالمي")
+        st.markdown(f'<a href="{u_mit}" target="_blank"><button style="width:100%; background-color:#a31f34; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold; margin-bottom:10px;">🏛️ MIT Theses (رسائل MIT)</button></a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="{u_oatd}" target="_blank"><button style="width:100%; background-color:#f39200; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold; margin-bottom:10px;">🎓 OATD (الرسائل العالمية)</button></a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="{u_semantic}" target="_blank"><button style="width:100%; background-color:#6a1b9a; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold;">🧠 Semantic Scholar</button></a>', unsafe_allow_html=True)
     
-    with col_global:
-        st.markdown("### 🌐 الجناح العالمي (MIT & OATD)")
-        st.markdown(f'<a href="{u_mit}" target="_blank"><button style="width:100%; background-color:#a31f34; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold; margin-bottom:10px;">🏛️ MIT Theses (رسائل MIT)</button></a>', unsafe_allow_html=True)
-        st.markdown(f'<a href="{u_oatd}" target="_blank"><button style="width:100%; background-color:#f39200; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold; margin-bottom:10px;">🎓 OATD (الرسائل العالمية)</button></a>', unsafe_allow_html=True)
-        st.markdown(f'<a href="{u_semantic}" target="_blank"><button style="width:100%; background-color:#6a1b9a; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold;">🧠 Semantic Scholar</button></a>', unsafe_allow_html=True)
-
-    with col_arabic:
+    with col_a:
         st.markdown("### 🇸🇦 الجناح العربي")
-        st.markdown(f'<a href="{u_mandumah}" target="_blank"><button style="width:100%; background-color:#004b87; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold; margin-bottom:10px;">📚 دار المنظومة</button></a>', unsafe_allow_html=True)
-        st.markdown(f'<a href="https://shamaa.org/" target="_blank"><button style="width:100%; background-color:#17a2b8; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold; margin-bottom:10px;">💎 قاعدة شمعة</button></a>', unsafe_allow_html=True)
-        
-        # الزر السحري (تم إصلاح برمجته لفتح الأدوات العالمية)
-        magic_script = f"""
-        <button onclick="window.open('{u_mit}'); window.open('{u_oatd}'); window.open('{u_mandumah}');" 
-        style="width:100%; background-color:#1c243d; color:white; border:none; border-radius:10px; height:3.5em; cursor:pointer; font-weight:bold;">
-            🚀 تشغيل الاستقصاء (MIT + OATD + المنظومة)
-        </button>
-        """
-        st.components.v1.html(magic_script, height=65)
+        st.markdown(f'<a href="{u_mandumah}" target="_blank"><button style="width:100%; background-color:#004b87; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold; margin-bottom:10px;">📚 دار المنظومة</button></a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="https://shamaa.org/" target="_blank"><button style="width:100%; background-color:#17a2b8; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold; margin-bottom:10px;">💎 قاعدة شمعة</button></a>', unsafe_allow_html=True)
+        # الزر الذي يجمع عوالم الصور (MIT, OATD, المنظومة)
+        magic_html = f'<button onclick="window.open(\'{u_mit}\');window.open(\'{u_oatd}\');window.open(\'{u_mandumah}\');" style="width:100%; background-color:#1c243d; color:white; border:none; border-radius:10px; height:3em; cursor:pointer; font-weight:bold;">🚀 الاستقصاء الشامل (فتح 3 مصادر)</button>'
+        st.components.v1.html(magic_html, height=55)
 
-    # 3. الأدوات التفاعلية (تم تصحيح المسافات هنا)
+    # 3. القاموس والأرشفة (كما في صورتك 67)
     st.markdown("---")
-    tab_dict, tab_lib = st.tabs(["📘 قاموس المصطلحات", "📂 أرشفة مراجعكِ"])
-    
-    with tab_dict:
+    t1, t2 = st.tabs(["📘 قاموس المصطلحات", "📂 أرشفة مراجعكِ"])
+    with t1:
         c1, c2 = st.columns([1, 2])
         with c1:
-            n_ar = st.text_input("عربي:", key="ar_k")
-            n_en = st.text_input("إنجليزي:", key="en_k")
+            ar_in = st.text_input("عربي:", key="ar_z")
+            en_in = st.text_input("إنجليزي:", key="en_z")
             if st.button("إضافة"):
-                if n_ar and n_en:
-                    st.session_state.dictionary[n_ar] = n_en
-                    st.rerun()
-        with c2:
-            st.table(pd.DataFrame(list(st.session_state.dictionary.items()), columns=['العربية', 'الإنجليزية']))with tab_lib:
+                if ar_in and en_in: st.session_state.dictionary[ar_in] = en_in; st.rerun()
+        with c2: st.table(pd.DataFrame(list(st.session_state.dictionary.items()), columns=['العربية', 'الإنجليزية']))
+    with t2:
         c3, c4 = st.columns([1, 2])
         with c3:
-            t_ref = st.text_input("عنوان البحث:", key="t_k")
-            l_ref = st.text_input("الرابط:", key="l_k")
-            if st.button("أرشفة الآن"):
-                if t_ref and l_ref:
-                    st.session_state.library.append({"العنوان": t_ref, "الرابط": l_ref, "تاريخ": datetime.now().strftime("%Y-%m-%d")})
-                    st.rerun()
-        with c4:
-            if st.session_state.library:
-                st.dataframe(pd.DataFrame(st.session_state.library), use_container_width=True)
-
-st.markdown("<p style='text-align: center; color: gray;'>M.A. Altwaijer 2026 - الإصدار المستقر</p>", unsafe_allow_html=True)
+            t_ref = st.text_input("العنوان:", key="t_z")
+            l_ref = st.text_input("الرابط:", key="l_z")
+            if st.button("حفظ"):
+                if t_ref and l_ref: st.session_state.library.append({"العنوان": t_ref, "الرابط": l_ref, "التاريخ": datetime.now().strftime("%Y-%m-%d")}); st.rerun()
+        with c4: 
+            if st.session_state.library: st.dataframe(pd.DataFrame(st.session_state.library))
+                st.markdown("<p style='text-align: center; color: gray;'>M.A. Altwaijer 2026 - الإصدار المستقر</p>", unsafe_allow_html=True)
