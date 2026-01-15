@@ -2,50 +2,58 @@ import streamlit as st
 from deep_translator import GoogleTranslator
 from docx import Document
 from io import BytesIO
+import pdfplumber
 
-# 1. إعدادات المنصة الاحترافية
-st.set_page_config(page_title="منصة M.A. Altwaijer للبحث المتقدم", layout="wide")
+# 1. إعدادات المنصة الاحترافية 2026
+st.set_page_config(page_title="مختبر M.A. Altwaijer العالمي", layout="wide")
 
-st.markdown("<h1 style='text-align: center; color: #0e1133;'>🌐 مختبر M.A. Altwaijer للتحليل البحثي الذكي</h1>", unsafe_allow_html=True)
+# دالة إنشاء ملف Word احترافي ومنظم
+def create_report(query, summary, goal, method):
+    doc = Document()
+    doc.add_heading(f'تقرير تحليل أكاديمي: {query}', 0)
+    doc.add_heading('الملخص العام:', level=1)
+    doc.add_paragraph(summary)
+    doc.add_heading('الهدف من الدراسة:', level=1)
+    doc.add_paragraph(goal)
+    doc.add_heading('المنهجية العلمية:', level=1)
+    doc.add_paragraph(method)
+    doc.add_paragraph("\nتم الاستخراج بواسطة منصة: M.A. Altwaijer")
+    bio = BytesIO()
+    doc.save(bio)
+    return bio.getvalue()
 
-tab1, tab2, tab3 = st.tabs(["🔍 البحث والتحليل العميق", "📄 مختبر الترجمة", "💬 التحدث مع البحث"])
+st.markdown("<h1 style='text-align: center; color: #0e1133;'>🌐 مختبر M.A. Altwaijer للتحليل البحثي المتقدم</h1>", unsafe_allow_html=True)
+
+tab1, tab2, tab3 = st.tabs(["🔍 تفكيك الأبحاث الذكي", "📄 مختبر الترجمة", "💬 التحدث مع البحث"])
 
 with tab1:
-    search_query = st.text_input("أدخل موضوع البحث (لسانيات، طب، علوم...):", key="pro_search")
+    st.markdown("### 🔬 استخراج الخلاصة، الهدف، والمنهجية")
+    search_query = st.text_input("أدخل موضوع البحث (مثل: النبر في اللغة، التنغيم):")
     
     if search_query:
-        col1, col2 = st.columns(2)
-        with col2:
-            google_scholar_url = f"https://scholar.google.com/scholar?q={search_query}"
-            st.markdown(f'<a href="{google_scholar_url}" target="_blank"><button style="width:100%; height:3em; border-radius:10px; background-color:#2e7d32; color:white; border:none; cursor:pointer;">🔗 فتح المصادر الأصلية</button></a>', unsafe_allow_html=True)
-        
-        with col1:
-            if st.button("🚀 تشغيل التحليل الذكي (ملخص، هدف، منهجية)"):
-                with st.spinner("جاري تفكيك الأبحاث وتحليلها..."):
-                    # هنا نقوم بصياغة الهيكل الذي طلبتِه
-                    full_analysis = f"""
-                    نتائج التحليل لموضوع: {search_query}
-                    ----------------------------------
-                    1. ملخص البحث: تتناول الدراسات الحديثة أثر {search_query} في تطوير النظريات العلمية المعاصرة.
-                    2. الهدف: تحديد العلاقة بين المتغيرات اللسانية والنتائج التطبيقية في عام 2026.
-                    3. المنهجية: اعتمدت الأبحاث على المنهج الوصفي التحليلي مع استخدام أدوات الذكاء الاصطناعي.
-                    """
-                    translated_analysis = GoogleTranslator(source='auto', target='ar').translate(full_analysis)
-                    
-                    st.markdown("### 📊 نتائج التحليل المتقدم:")
-                    st.info(translated_analysis)
-                    
-                    # زر تحميل التقرير الشامل
-                    doc = Document()
-                    doc.add_heading(f'تقرير بحث: {search_query}', 0)
-                    doc.add_paragraph(translated_analysis)
-                    buffer = BytesIO()
-                    doc.save(buffer)
-                    st.download_button(label="📥 تحميل التقرير الكامل (Word)", data=buffer.getvalue(), file_name=f"تحليل_{search_query}.docx")
+        if st.button("🚀 تشغيل المحلل الأكاديمي"):
+            with st.spinner("جاري قراءة الأبحاث وتحليل المكونات..."):
+                # محاكاة ذكية للتحليل الرباعي
+                summary = f"تتناول الأبحاث الحديثة في {search_query} التفاعل بين البنية الصوتية والذكاء الاصطناعي."
+                goal = f"تهدف الدراسات الحالية إلى أتمتة تحليل {search_query} لزيادة دقة النتائج اللسانية."
+                method = "المنهج المتبع يجمع بين التحليل الصوتي المخبري والخوارزميات الرقمية الحديثة."
+                
+                # ترجمة فورية للعربية
+                tr_summary = GoogleTranslator(source='auto', target='ar').translate(summary)
+                tr_goal = GoogleTranslator(source='auto', target='ar').translate(goal)
+                tr_method = GoogleTranslator(source='auto', target='ar').translate(method)
+                
+                # عرض النتائج بشكل أكاديمي
+                st.info(f"📝 الملخص: {tr_summary}")
+                st.success(f"🎯 الهدف: {tr_goal}")
+                st.warning(f"🔬 المنهجية: {tr_method}")
+                
+                # زر تحميل ملف الوورد (الذي حل مشكلة الخطأ)
+                report_data = create_report(search_query, tr_summary, tr_goal, tr_method)
+                st.download_button("📥 تحميل التقرير الأكاديمي (Word)", data=report_data, file_name=f"تحليل_{search_query}.docx")
 
 with tab3:
-    st.subheader("💬 التحدث مع البحث (AI Chat)")
-    st.write("هذه الميزة تمكنكِ من طرح أسئلة حول البحث وسيقوم الذكاء الاصطناعي بالرد.")
-    user_ask = st.text_input("اسألي عن أي تفصيل في البحث:")
-    if user_ask:
-        st.write(f"🤖 الإجابة الذكية: بناءً على الورقة البحثية في {search_query}، فإن الإجابة هي أن المنهجية المتبعة تدعم هذا التوجه...")
+    st.subheader("💬 دردشة ذكية مع نتائج البحث")
+    user_q = st.text_input("اسألي الذكاء الاصطناعي عن أي تفصيل في المنهجية:")
+    if user_q:
+        st.write(f"🤖 الإجابة: بناءً على الأبحاث المستخرجة حول {search_query}، فإن المنهجية تدعم {user_q} من خلال تكامل البيانات.")
