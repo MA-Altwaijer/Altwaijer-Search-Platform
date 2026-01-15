@@ -1,78 +1,37 @@
 import streamlit as st
-import requests
 
-# 1. الإعدادات بالاسم المختصر
-st.set_page_config(page_title="M.A. Altwaijer Platform", page_icon="🎓", layout="wide")
+# 1. إعدادات المنصة
+st.set_page_config(page_title="منصة M.A. Altwaijer العالمية", layout="wide")
 
-# 2. اللغات والواجهة (تعديل الاسم إلى M.A. Altwaijer)
-texts = {
-    "العربية": {
-        "title": "🎓 منصة M.A. Altwaijer للبحث العلمي",
-        "sub": "بوابة أكاديمية شاملة للبحث في اللسانيات وكافة العلوم",
-        "label": "أدخل موضوع البحث:",
-        "button": "استخراج النتائج والتحليل",
-        "results": "تم العثور على {} مرجعاً علمياً",
-        "summary": "ملخص البحث / Analysis:",
-        "footer": "إشراف: M.A. Altwaijer - 2026"
-    },
-    "English": {
-        "title": "🎓 M.A. Altwaijer Academic Platform",
-        "sub": "Comprehensive Academic Portal for Linguistics & Global Sciences",
-        "label": "Enter research topic:",
-        "button": "Extract & Analyze Results",
-        "results": "Found {} academic references",
-        "summary": "Abstract / Summary:",
-        "footer": "Supervised by: M.A. Altwaijer - 2026"
-    }
-}
+st.markdown("<h1 style='text-align: center; color: #0e1133;'>🌐 بوابة M.A. Altwaijer للرسائل العلمية العالمية</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>الوصول المباشر لأكبر مستودعات رسائل الماجستير والدكتوراه المجانية</p>", unsafe_allow_html=True)
 
-with st.sidebar:
-    lang = st.selectbox("Language / اللغة", ["العربية", "English"])
+# 2. منطقة البحث
+search_query = st.text_input("🔍 أدخل موضوع البحث (بالعربية أو الإنجليزية):", placeholder="مثلاً: Intonation, Linguistics...")
 
-t = texts[lang]
-st.title(t["title"])
-st.markdown(f"##### {t['sub']}")
-st.divider()
-
-# 3. محرك البحث
-query = st.text_input(t["label"], "")
-
-if st.button(t["button"]):
-    if query:
-        with st.spinner('جاري فحص القواعد العلمية...'):
-            url = f"https://api.openalex.org/works?search={query}"
-            try:
-                response = requests.get(url)
-                data = response.json()
-                results = data.get('results', [])
-                
-                if results:
-                    st.success(t["results"].format(data.get('meta', {}).get('count')))
-                    for i, paper in enumerate(results[:10], 1):
-                        with st.expander(f"📄 {i}. {paper.get('display_name')}"):
-                            abstract_raw = paper.get('abstract_inverted_index')
-                            if abstract_raw:
-                                words = {}
-                                for word, indices in abstract_raw.items():
-                                    for index in indices: words[index] = word
-                                abstract_text = ' '.join([words[i] for i in sorted(words.keys())])
-                                st.info(f"{t['summary']}\n\n{abstract_text[:800]}...") 
-                            else:
-                                st.warning("الملخص غير متوفر رقمياً.")
-                            
-                            col1, col2 = st.columns([2, 1])
-                            with col1:
-                                st.write(f"📅 السنة: {paper.get('publication_year')}")
-                                st.write(f"🏢 المصدر: {paper.get('primary_location', {}).get('source', {}).get('display_name', 'مصدر أكاديمي')}")
-                            with col2:
-                                if paper.get('doi'):
-                                    st.link_button("تحميل/قراءة البحث", paper.get('doi'))
-                else:
-                    st.warning("لم يتم العثور على نتائج.")
-            except:
-                st.error("خطأ في الاتصال.")
-    else:
-        st.warning("يرجى كتابة موضوع للبحث.")
+if search_query:
+    st.markdown(f"### 🚀 استكشاف المراجع العالمية حول: {search_query}")
+    
+    # توزيع الروابط المستخرجة من صورتك إلى مجموعات
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.info("🏛️ المستودعات الكبرى")
+        # ProQuest & OATD
+        st.markdown(f' <a href="https://www.proquest.com/results.controlresults.search?searchTerm={search_query}" target="_blank"><button style="width:100%; margin-bottom:10px;">📚 ProQuest Dissertations</button></a>', unsafe_allow_html=True)
+        st.markdown(f' <a href="https://oatd.org/oatd/search?q={search_query}" target="_blank"><button style="width:100%;">🎓 OATD (Open Access)</button></a>', unsafe_allow_html=True)
+        
+    with col2:
+        st.success("🎓 أفضل الجامعات (MIT & Harvard)")
+        # MIT & Harvard
+        st.markdown(f' <a href="https://dspace.mit.edu/handle/1721.1/7582/discover?query={search_query}" target="_blank"><button style="width:100%; margin-bottom:10px;">🏛️ MIT Theses</button></a>', unsafe_allow_html=True)
+        st.markdown(f' <a href="https://dash.harvard.edu/browse?type=author&query={search_query}" target="_blank"><button style="width:100%;">🏛️ Harvard DASH</button></a>', unsafe_allow_html=True)
+        
+    with col3:
+        st.warning("🌍 مراجع أوروبا وبريطانيا")
+        # British Library & DART Europe
+        st.markdown(f' <a href="https://www.dart-europe.org/basic-search.php?query={search_query}" target="_blank"><button style="width:100%; margin-bottom:10px;">🇪🇺 DART-Europe Portal</button></a>', unsafe_allow_html=True)
+        st.markdown(f' <a href="https://ethos.bl.uk/OrderDetails.do?uin={search_query}" target="_blank"><button style="width:100%;">🇬🇧 British Library (EThOS)</button></a>', unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption(t["footer"])
+st.markdown("<div style='text-align: center; color: #666;'>بناءً على توصيات المصادر الأكاديمية العالمية - 2026</div>", unsafe_allow_html=True)
