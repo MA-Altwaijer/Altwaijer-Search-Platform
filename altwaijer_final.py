@@ -1,17 +1,15 @@
 import streamlit as st
-from deep_translator import GoogleTranslator # مكتبة الترجمة المجانية
+from deep_translator import GoogleTranslator
+import pdfplumber
 
-# 1. إعدادات الصفحة
-st.set_page_config(page_title="منصة M.A. Altwaijer العلمية", page_icon="🎓", layout="wide")
+# إعدادات الواجهة الشاملة
+st.set_page_config(page_title="منصة M.A. Altwaijer العلمية", layout="wide")
 
-# 2. تصميم الواجهة
 st.markdown("""
     <style>
-    .main { background-color: #f8f9fa; }
-    .stButton>button { width: 100%; border-radius: 20px; background-color: #0e1133; color: white; border: none; height: 3em; }
-    .stButton>button:hover { background-color: #1a237e; color: white; }
-    .title-text { color: #0e1133; text-align: center; font-weight: bold; padding: 20px; }
-    .footer { text-align: center; color: #666; padding: 20px; margin-top: 50px; border-top: 1px solid #ddd; }
+    .main { background-color: #f0f2f6; }
+    .stButton>button { border-radius: 20px; background-color: #0e1133; color: white; height: 3em; width: 100%; }
+    .title-text { color: #0e1133; text-align: center; font-weight: bold; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -21,18 +19,20 @@ tab1, tab2, tab3 = st.tabs(["🔍 محرك البحث الذكي", "📄 مخت�
 
 with tab2:
     st.subheader("📤 رفع ملف PDF لترجمته وتحليله")
-    uploaded_file = st.file_uploader("اختر ملف الكتاب أو البحث (PDF)", type="pdf")
+    uploaded_file = st.file_uploader("اختر ملف PDF", type="pdf")
     
     if uploaded_file:
         st.success("تم رفع الملف بنجاح.")
-        if st.button("بدء الترجمة الفورية"): # تم تصحيح الكلمة هنا
-            with st.spinner("جاري معالجة النص وترجمته للعربية..."):
-                # محاكاة الترجمة (سنقوم بربط استخراج النص الكامل في الخطوة القادمة)
-                test_text = "This is a scientific research paper in Linguistics and Biology."
-                translated = GoogleTranslator(source='auto', target='ar').translate(test_text)
-                st.write("---")
-                st.markdown("### النتيجة المترجمة:")
-                st.write(translated)
-                st.info("ملاحظة: هذه ترجمة تجريبية للعنوان، لتفعيل ترجمة الكتاب كاملاً نحتاج لرفع ملف requirements.txt")
-
-# بقية الأكواد كما هي...
+        # تصحيح الخطأ الإملائي وتفعيل الترجمة
+        if st.button("بدء الترجمة الفورية والحفاظ على التنسيق"): 
+            with st.spinner("جاري استخراج النص وترجمته..."):
+                with pdfplumber.open(uploaded_file) as pdf:
+                    first_page = pdf.pages[0].extract_text()
+                
+                if first_page:
+                    # ترجمة أول جزء من النص كمرحلة أولى
+                    translated = GoogleTranslator(source='auto', target='ar').translate(first_page[:500])
+                    st.markdown("### النتيجة المترجمة (الصفحة الأولى):")
+                    st.write(translated)
+                else:
+                    st.error("لم نتمكن من قراءة النص، قد يكون الملف عبارة عن صور.")
