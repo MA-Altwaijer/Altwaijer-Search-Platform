@@ -1,5 +1,4 @@
 streamlit
-requests
-deep-translator
+pandas
+google-generativeai
 pdfplumber
-python-docx
