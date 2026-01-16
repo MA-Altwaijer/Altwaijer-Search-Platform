@@ -3,7 +3,7 @@ import pandas as pd
 import google.generativeai as genai
 import urllib.parse
 
-# 1. إعداد المحرك العالمي (مفتاحكِ مدمج وجاهز)
+# 1. إعداد المحرك العالمي
 GEMINI_KEY = "AIzaSyDlB20oD63RlgMxF2Unfx7dqDjpwR2NM_U"
 
 if GEMINI_KEY.startswith("AIza"):
@@ -36,7 +36,7 @@ if uploaded_files and GEMINI_KEY.startswith("AIza"):
                 }
                 all_results.append(res)
             
-            # عرض النتائج في نظام بطاقات احترافي
+            # عرض النتائج في نظام بطاقات
             df = pd.DataFrame(all_results)
             st.success("✅ تم تحليل الأبحاث بنجاح!")
             for index, row in df.iterrows():
