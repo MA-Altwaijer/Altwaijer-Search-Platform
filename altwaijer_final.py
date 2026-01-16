@@ -1,55 +1,55 @@
 import streamlit as st
 import pandas as pd
 
-# 1. إعدادات المنصة العالمية
-st.set_page_config(page_title="M.A. Altwaijer Global Search", layout="wide")
+# 1. إعدادات المنصة
+st.set_page_config(page_title="M.A. Altwaijer Global Lab", layout="wide")
 if 'library' not in st.session_state: st.session_state.library = []
 
-st.markdown("<h1 style='text-align:center;'>🌐 منصة M.A. Altwaijer العالمية للبحث الأكاديمي الشامل</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>🌐 منصة M.A. Altwaijer العالمية المتقدمة</h1>", unsafe_allow_html=True)
 
-# 2. محرك البحث الحر (بدون قيود أو أقواس)
-st.markdown("### 🔍 محرك البحث الأكاديمي الحر")
-query = st.text_input("أدخلي موضوع البحث (في أي علم أو تخصص):", placeholder="مثلاً: النبر، الذكاء الاصطناعي، الاقتصاد الرقمي...")
+# 2. مصفاة التخصص (اختياري)
+with st.sidebar:
+    st.header("⚙️ ضبط البحث")
+    is_linguistics = st.checkbox("تركيز البحث على اللسانيات فقط", value=True)
+    exclude_terms = " -طب -قانون -جراحة" if is_linguistics else ""
+
+# 3. محرك البحث الشامل
+st.markdown("### 🔍 محرك البحث الذكي (عالمي + عربي)")
+query = st.text_input("أدخلي موضوع البحث:", placeholder="مثلاً: النبر، التنغيم، أو أي تخصص آخر...")
 
 if query:
-    st.info(f"استكشاف النتائج العالمية لـ: {query}")
-    col1, col2 = st.columns(2)
+    # صياغة الاستعلام بناءً على رغبتك في التخصص أو العالمية
+    search_q = f'"{query}"' + (f" AND (لسانيات OR لغة)" if is_linguistics else "")
     
+    col1, col2 = st.columns(2)
     with col1:
-        st.markdown("#### 🌍 المصادر العالمية (Open Access)")
-        # البحث الحر في قوقل سكولر بدون إضافات إجبارية
-        st.markdown(f'<a href="https://scholar.google.com/scholar?q={query}" target="_blank"><button style="width:100%;background:#2e7d32;color:white;border-radius:10px;height:3em;font-weight:bold;margin-bottom:10px;">🔍 Google Scholar</button></a>', unsafe_allow_html=True)
-        # سيمنتك سكولر للوصول الذكي
-        st.markdown(f'<a href="https://www.semanticscholar.org/search?q={query}" target="_blank"><button style="width:100%;background:#6a1b9a;color:white;border-radius:10px;height:3em;font-weight:bold;margin-bottom:10px;">🧠 Semantic Scholar</button></a>', unsafe_allow_html=True)
-
+        st.markdown("#### 🔓 تحميل مباشر (PDF)")
+        st.markdown(f'<a href="https://scholar.google.com/scholar?q={query}{exclude_terms}" target="_blank"><button style="width:100%;background:#2e7d32;color:white;border-radius:10px;height:3em;font-weight:bold;margin-bottom:10px;">🔍 Google Scholar</button></a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="https://www.semanticscholar.org/search?q={query}&pdf=true" target="_blank"><button style="width:100%;background:#6a1b9a;color:white;border-radius:10px;height:3em;font-weight:bold;">🧠 Semantic Scholar</button></a>', unsafe_allow_html=True)
     with col2:
-        st.markdown("#### 🏛️ المستودعات العربية والوطنية")
-        # توبقال - البحث الحر كما في الصورة 5
-        st.markdown(f'<a href="https://toubkal.imist.ma/browse?type=title&query={query}" target="_blank"><button style="width:100%;background:#c1272d;color:white;border-radius:10px;height:3em;font-weight:bold;margin-bottom:10px;">🇲🇦 مستودع توبقال</button></a>', unsafe_allow_html=True)
-        # المجلات العراقية - وصول مفتوح وشامل
-        st.markdown(f'<a href="https://www.iasj.net/iasj/search?query={query}" target="_blank"><button style="width:100%;background:#f39c12;color:white;border-radius:10px;height:3em;font-weight:bold;">🇮🇶 المجلات العراقية</button></a>', unsafe_allow_html=True)
+        st.markdown("#### 🏛️ توثيق عناوين ودراسات سابقة")
+        st.markdown(f'<a href="https://toubkal.imist.ma/browse?type=title&query={search_q}" target="_blank"><button style="width:100%;background:#c1272d;color:white;border-radius:10px;height:3em;font-weight:bold;margin-bottom:10px;">🇲🇦 مستودع توبقال</button></a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="https://www.iasj.net/iasj/search?query={query}" target="_blank"><button style="width:100%;background:#f39c12;color:white;border-radius:10px;height:3em;font-weight:bold;">🇮🇶 مجلات العراق</button></a>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 3. المختبر التحليلي (تفعيل الصورة 1)
-st.markdown("### 🔬 المختبر التحليلي لإدارة المراجع")
-with st.expander("📝 تلخيص دراسة جديدة (أضيفي بياناتكِ هنا لتظهر في المصفوفة)"):
+# 4. المختبر التحليلي (تفعيل المصفوفة)
+st.markdown("### 📋 مصفوفة الدراسات السابقة والتحليل")
+with st.expander("📥 إضافة دراسة جديدة للمقارنة"):
     c1, c2 = st.columns(2)
     with c1:
-        title = st.text_input("عنوان البحث:")
-        year = st.text_input("السنة:")
-        field = st.text_input("التخصص:")
+        t = st.text_input("عنوان البحث:")
+        y = st.text_input("السنة:")
     with c2:
-        page = st.text_input("رقم الصفحة:")
-        gap = st.text_area("الفجوة البحثية/الملاحظات:")
+        p = st.text_input("رقم الصفحة:")
+        g = st.text_area("الفجوة البحثية المكتشفة:")
     
-    if st.button("📥 حفظ في المصفوفة"):
-        if title:
-            st.session_state.library.append({"العنوان": title, "السنة": year, "التخصص": field, "الصفحة": page, "الفجوة": gap})
+    if st.button("حفظ المرجع"):
+        if t:
+            st.session_state.library.append({"العنوان": t, "السنة": y, "الصفحة": p, "الفجوة": g})
             st.rerun()
 
-# عرض المصفوفة (حل مشكلة الصورة 1)
 if st.session_state.library:
     st.table(pd.DataFrame(st.session_state.library))
 else:
-    st.write("المصفوفة فارغة حالياً. ابدئي بإضافة ملخصات البحوث من الأعلى.")
+    st.info("ابدئي بإضافة المراجع لتظهر لكِ مصفوفة المقارنة هنا.")
