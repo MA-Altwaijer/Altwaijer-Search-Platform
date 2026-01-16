@@ -6,7 +6,7 @@ import google.generativeai as genai
 # ضعي الرمز الذي نسختيه بين العلامتين " " بالأسفل
 GEMINI_KEY = "ضعي_الرمز_هنا" 
 
-if GEMINI_KEY != "ضعي_الرمز_هنا":
+if GEMINI_KEY != "AIzaSyAA964RE5QSIt9xR6XVgeKZ_uKPWiVKc3k":
     genai.configure(api_key=GEMINI_KEY)
     ai_model = genai.GenerativeModel('gemini-1.5-flash')
 
@@ -18,7 +18,7 @@ st.markdown("<h1 style='text-align:center;'>🧠 مختبر M.A. Altwaijer لل�
 st.markdown("### 📥 رفع البحث واستخراج البيانات آلياً")
 uploaded_file = st.file_uploader("ارفعي البحث (PDF) ليحلله Gemini:", type="pdf")
 
-if uploaded_file and GEMINI_KEY != "ضعي_الرمز_هنا":
+if uploaded_file and GEMINI_KEY != "AIzaSyAA964RE5QSIt9xR6XVgeKZ_uKPWiVKc3k":
     with st.spinner("Gemini يقرأ ويحلل الآن..."):
         # برمجة طلب التحليل (سنة، صفحة، فجوة)
         st.success("✅ تم الاستخراج الذكي! راجعي البيانات بالأسفل.")
@@ -49,3 +49,4 @@ if st.session_state.library:
     # ميزة التصدير لملف Excel جاهز لرسالة الدكتوراة
     csv = df.to_csv(index=False).encode('utf-8-sig')
     st.download_button("📥 تحميل المصفوفة لرسالة الدكتوراة", data=csv, file_name='doctoral_matrix.csv', mime='text/csv')
+
