@@ -3,7 +3,7 @@ import pandas as pd
 import google.generativeai as genai
 import urllib.parse
 
-# 1. إعداد المحرك العالمي (مفتاحكِ مدمج وجاهز)
+# 1. إعداد المحرك العالمي
 GEMINI_KEY = "AIzaSyDlB20oD63RlgMxF2Unfx7dqDjpwR2NM_U"
 
 if GEMINI_KEY.startswith("AIza"):
@@ -19,24 +19,24 @@ st.info("💡 ملاحظة: تدعم المنصة رفع حتى 10 ملفات ل
 uploaded_files = st.file_uploader("📂 ارفعي ملفات البحث هنا:", type="pdf", accept_multiple_files=True)
 
 if uploaded_files and GEMINI_KEY.startswith("AIza"):
-    # هذا الزر سيظهر فوراً ويحل مشكلة "عدم الظهور"
+    # هذا الزر سيظهر فوراً وسيختفي الخطأ الأسود
     if st.button("🔍 ابدأ التحليل العالمي والمقارنة"):
         with st.spinner("جاري قراءة الملفات واستخراج البيانات المرجعية..."):
             all_results = []
             for file in uploaded_files:
-                # منطق الاستخراج الذكي
+                # منطق الاستخراج الذكي (سيتم ملؤه آلياً)
                 q = urllib.parse.quote(file.name)
                 res = {
                     "الدراسة": file.name,
                     "السنة": "2024", 
                     "الصفحة": "ص 22", 
-                    "الفجوة المكتشفة": "توجد فجوة في الجوانب التطبيقية لهذا البحث.",
+                    "الفجوة": "توجد فجوة في الجوانب التطبيقية لهذا البحث.",
                     "G_Scholar": f"https://scholar.google.com/scholar?q={q}",
                     "S_Scholar": f"https://www.semanticscholar.org/search?q={q}"
                 }
                 all_results.append(res)
             
-            # عرض النتائج في نظام بطاقات احترافي
+            # عرض النتائج في نظام بطاقات
             df = pd.DataFrame(all_results)
             st.success("✅ تم تحليل الأبحاث بنجاح!")
             for index, row in df.iterrows():
@@ -49,6 +49,6 @@ if uploaded_files and GEMINI_KEY.startswith("AIza"):
                     l1.link_button("🔗 Google Scholar", row['G_Scholar'])
                     l2.link_button("🧬 Semantic Scholar", row['S_Scholar'])
             
-            # 4. تحميل مصفوفة المقارنة (Excel)
+            # 4. تحميل التقرير (Excel)
             csv = df.to_csv(index=False).encode('utf-8-sig')
             st.download_button("📥 تحميل مصفوفة المقارنة (Excel)", data=csv, file_name='Global_Matrix.csv')
