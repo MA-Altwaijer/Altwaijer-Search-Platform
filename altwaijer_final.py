@@ -3,7 +3,7 @@ import pandas as pd
 import google.generativeai as genai
 import urllib.parse
 
-# 1. إعداد المحرك العالمي
+# 1. إعداد المحرك العالمي (مفتاحكِ مدمج وجاهز)
 GEMINI_KEY = "AIzaSyDlB20oD63RlgMxF2Unfx7dqDjpwR2NM_U"
 
 if GEMINI_KEY.startswith("AIza"):
@@ -24,7 +24,7 @@ if uploaded_files and GEMINI_KEY.startswith("AIza"):
         with st.spinner("جاري قراءة الملفات واستخراج البيانات المرجعية..."):
             all_results = []
             for file in uploaded_files:
-                # منطق الاستخراج الذكي
+                # منطق الاستخراج الذكي (سيعمل آلياً)
                 q = urllib.parse.quote(file.name)
                 res = {
                     "الدراسة": file.name,
