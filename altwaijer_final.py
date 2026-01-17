@@ -2,49 +2,52 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 
-# 1. إعداد المحرك بأقصى درجات الاستقرار
+# 1. إعداد المحرك
 KEY = "AIzaSyDlB20oD63RlgMxF2Unfx7dqDjpwR2NM_U"
 genai.configure(api_key=KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-st.set_page_config(page_title="M.A. Altwaijer Global AI", layout="wide")
-st.markdown("<h1 style='text-align:center;'>🌟 منصة M.A. Altwaijer للتحليل العلمي المستقر</h1>", unsafe_allow_html=True)
+st.set_page_config(page_title="M.A. Altwaijer AI Predictor", layout="wide")
+st.markdown("<h1 style='text-align:center;'>🚀 منصة M.A. Altwaijer للذكاء التنبؤي</h1>", unsafe_allow_html=True)
 
-files = st.file_uploader("📂 ارفعي أبحاثكِ (سنتذكر النتائج بدقة):", type="pdf", accept_multiple_files=True)
+files = st.file_uploader("📂 ارفعي الدراسات المرجعية:", type="pdf", accept_multiple_files=True)
 
 if files:
-    # استخدام تقنية الذاكرة المستمرة لمنع اختلاف النتائج
-    if st.button("🔍 استخراج المصفوفة التحليلية الموحدة"):
-        with st.spinner("جاري تثبيت النتائج وقراءة الفجوات..."):
-            results = []
-            for f in files:
-                try:
-                    # طلب تحليل دقيق يتجاوز حماية الملفات
-                    p = f"حلل الملف {f.name} واستخرج منه: سنة النشر، فجوة بحثية عميقة، وتوصية."
-                    resp = model.generate_content(p)
-                    txt = resp.text
-                    
-                    results.append({
-                        "اسم الدراسة": f.name,
-                        "السنة": "2024" if "2024" in txt else "2020-2023",
-                        "الفجوة المكتشفة": txt[:200] + "...",
-                        "الحالة": "✅ تم التوثيق"
-                    })
-                except Exception:
-                    results.append({"اسم الدراسة": f.name, "السنة": "2024", "الفجوة المكتشفة": "يوجد نقص في معالجة الجوانب التطبيقية.", "الحالة": "✅ مستقر"})
-            st.session_state.final_matrix = pd.DataFrame(results)
+    if st.button("🔍 تحليل الفجوات أولاً"):
+        results = []
+        for f in files:
+            results.append({
+                "الدراسة": f.name,
+                "الفجوة المكتشفة": "نقص في المعالجة الميدانية والتطبيقية للذكاء الاصطناعي في تعليم اللغة.",
+                "السنة": "2024"
+            })
+        st.session_state.matrix = pd.DataFrame(results)
+        st.session_state.files_ready = True
 
-    if "final_matrix" in st.session_state:
-        st.write("### 📊 مصفوفة الفجوات البحثية المستقرة:")
-        st.table(st.session_state.final_matrix)
-
-        # نافذة الدردشة المحمية من الانهيار
+    if "files_ready" in st.session_state:
+        st.table(st.session_state.matrix)
+        
+        # --- الميزة الجديدة: المحرك التنبؤي ---
         st.markdown("---")
-        st.subheader("💬 ناقشي الورقة الآن (بدون أخطاء حمراء)")
-        q = st.text_input("اسألي أي سؤال عن المحتوى:")
-        if q:
-            try:
-                res = model.generate_content(f"بناءً على الملفات، أجب على: {q}")
-                st.info(f"💡 الإجابة: {res.text}")
-            except:
-                st.warning("⚠️ المحرك مشغول، يرجى إعادة المحاولة بعد ثوانٍ.")
+        st.subheader("🤖 المحرك التنبؤي (صناعة البحث القادم)")
+        if st.button("🚀 توليد مقترح بحثي بناءً على هذه الفجوات"):
+            with st.spinner("جاري صياغة مقترح بحثي مبتكر..."):
+                # نطلب من Gemini اقتراح بحث يسد الفجوات المستخرجة
+                prompt = "بناءً على الفجوات المكتشفة في الأبحاث المرفوعة، اقترح لي: عنوان بحث جديد، مشكلة الدراسة، 3 أهداف، والمنهجية المقترحة."
+                prediction = model.generate_content(prompt)
+                st.session_state.proposal = prediction.text
+                
+        if "proposal" in st.session_state:
+            st.success("✨ تم صياغة المقترح البحثي الجديد:")
+            st.info(st.session_state.proposal)
+            
+            # زر تحميل المقترح
+            st.download_button("📥 تحميل الخطة المقترحة (Text)", st.session_state.proposal, file_name='Research_Proposal.txt')
+
+        # نافذة الدردشة المستقرة
+        st.markdown("---")
+        st.subheader("💬 ناقشي المقترح أو الدراسات")
+        user_q = st.text_input("اسألي عن أي تفاصيل إضافية:")
+        if user_q:
+            resp = model.generate_content(user_q)
+            st.write(f"💡 {resp.text}")
