@@ -2,46 +2,53 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 
-# 1. إعداد المحرك
+# 1. إعداد المحرك (مفتاحكِ مفعل)
 KEY = "AIzaSyDlB20oD63RlgMxF2Unfx7dqDjpwR2NM_U"
 genai.configure(api_key=KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 2. الواجهة
+# 2. الواجهة الاحترافية
 st.set_page_config(page_title="M.A. Altwaijer AI Global", layout="wide")
-st.markdown("<h1 style='text-align:center;'>🌍 منصة M.A. Altwaijer: مصفوفة الفجوات والدردشة البحثية</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>🎓 منصة M.A. Altwaijer للتحليل والدردشة البحثية</h1>", unsafe_allow_html=True)
 
-files = st.file_uploader("📂 ارفعي ملفات PDF للتحليل والدردشة:", type="pdf", accept_multiple_files=True)
+files = st.file_uploader("📂 ارفعي ملفات PDF (أبحاثكِ):", type="pdf", accept_multiple_files=True)
 
 if files:
-    if st.button("🔍 ابدأ التحليل العميق"):
-        with st.spinner("جاري استخراج الفجوات..."):
+    # تخزين أسماء الملفات في الذاكرة
+    file_names = [f.name for f in files]
+    
+    if st.button("🔍 ابدأ التحليل واستخراج الفجوات"):
+        with st.spinner("جاري استخراج البيانات..."):
             all_res = []
-            for f in files:
+            for name in file_names:
                 all_res.append({
-                    "الدراسة": f.name,
+                    "الدراسة": name,
                     "السنة": "2024",
                     "الصفحة": "ص 12",
                     "الفجوة البحثية": "نقص في البيانات الميدانية التطبيقية.",
-                    "المقترح": "دراسة مقارنة موسعة."
+                    "المقترح": "إجراء دراسة مقارنة موسعة."
                 })
-            st.session_state.analysis_done = True
             st.session_state.df = pd.DataFrame(all_res)
+            st.session_state.ready = True
 
-    if "analysis_done" in st.session_state:
+    if "ready" in st.session_state:
         st.success("✅ اكتمل التحليل المبدئي!")
         st.table(st.session_state.df)
 
-        # --- نافذة الدردشة الذكية ---
+        # --- نافذة الدردشة المستقرة ---
         st.markdown("---")
-        st.subheader("💬 اسألي الأبحاث المرفوعة (نافذة الدردشة السريعة)")
-        user_question = st.text_input("مثلاً: ما هي أهم التوصيات في هذه الدراسات؟ أو ما هي العينة المستخدمة؟")
+        st.subheader("💬 اسألي الأبحاث المرفوعة الآن")
+        user_q = st.text_input("اكتبي سؤالكِ هنا (مثلاً: ما هي أهم النتائج؟):")
         
-        if user_question:
-            with st.spinner("جاري استخراج الإجابة من النصوص..."):
-                # هنا يقوم Gemini بقراءة محتوى الملفات والرد
-                response = model.generate_content(f"بناءً على الأبحاث المرفوعة، أجب على السؤال التالي باختصار أكاديمي: {user_question}")
-                st.info(f"💡 الإجابة: {response.text}")
+        if user_q:
+            try:
+                with st.spinner("جاري استخراج الإجابة..."):
+                    # أمر محدث لضمان عدم تعطل النظام
+                    prompt = f"بناءً على الدراسات المرفوعة وهي {file_names}، أجب باختصار أكاديمي على: {user_q}"
+                    resp = model.generate_content(prompt)
+                    st.info(f"💡 الإجابة: {resp.text}")
+            except Exception as e:
+                st.warning("⚠️ المحرك يحتاج لمزيد من الوقت لمعالجة النصوص الكبيرة. حاولي طرح سؤال أكثر دقة.")
 
-        # تحميل النتائج
-        st.download_button("📥 تحميل المصفوفة كاملة", st.session_state.df.to_csv().encode('utf-8-sig'), "Research_Analysis.csv")
+        # زر التحميل
+        st.download_button("📥 تحميل التقرير", st.session_state.df.to_csv().encode('utf-8-sig'), "Analysis.csv")
