@@ -5,6 +5,7 @@ from docx import Document
 from io import BytesIO
 from pypdf import PdfReader
 from pyvis.network import Network
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Altwaijer Academic Hub", layout="wide")
 st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
@@ -41,7 +42,6 @@ if files:
             doc = Document()
             doc.add_heading(st.session_state.get('title', 'دراسة تجميعية'), 0)
             
-            # صياغة الفقرات المقارنة
             doc.add_heading('تحليل الدراسات العربية والأجنبية', level=1)
             p = doc.add_paragraph("من خلال استقراء الأدبيات، نجد تبايناً منهجياً؛ ")
             for s in studies:
@@ -61,7 +61,7 @@ if files:
             net.add_node(i+1, label=f"{s['name']}", color=color)
             net.add_edge(0, i+1)
         net.save_graph("graph.html")
-        st.components.v1.html(open("graph.html", 'r', encoding='utf-8').read(), height=550)
+        components.html(open("graph.html", 'r', encoding='utf-8').read(), height=550)
 
 st.markdown("---")
 st.caption("إشراف وتطوير: د. مبروكة التويجر - 2026")
