@@ -1,7 +1,6 @@
 streamlit
 pandas
 google-generativeai
-pdfplumber
 pypdf
 python-docx
 pyvis
