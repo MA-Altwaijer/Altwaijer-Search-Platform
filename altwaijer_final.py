@@ -2,58 +2,58 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 
-# 1. نظام الأمان المتقدم (سحب المفتاح من Secrets)
+# 1. نظام الأمان الرقمي (سحب المفتاح من الخزنة السرية)
 try:
-    # الكود الآن ينادي المفتاح من الخزنة التي ضغطتِ Save فيها
     API_KEY = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel('gemini-1.5-flash')
 except Exception:
-    st.warning("⚠️ تنبيه: يرجى التأكد من وضع GEMINI_API_KEY في إعدادات Secrets.")
+    st.error("⚠️ تنبيه: يرجى التحقق من إعدادات الربط الآمن.")
 
-# 2. واجهة منصة M.A. Altwaijer للذكاء التنبؤي
-st.set_page_config(page_title="M.A. Altwaijer Predictor", layout="wide")
-st.markdown("<h1 style='text-align:center;'>🚀 منصة M.A. Altwaijer للذكاء التنبؤي</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>التحليل العميق للفجوات البحثية وصناعة المقترحات المبتكرة</p>", unsafe_allow_html=True)
+# 2. الواجهة الأكاديمية (Academic Interface)
+st.set_page_config(page_title="M.A. Altwaijer Academic Platform", layout="wide")
+st.markdown("<h1 style='text-align:center;'>🎓 منصة M.A. Altwaijer للاستدلال وصياغة المقترحات البحثية</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>تحليل منهجي للفجوات المعرفية وتطوير استراتيجيات البحث العلمي</p>", unsafe_allow_html=True)
 
-# 3. محرك رفع ومعالجة الأبحاث
-uploaded_files = st.file_uploader("📂 ارفعي ملفات الأبحاث (PDF):", type="pdf", accept_multiple_files=True)
+# 3. محرك تحليل الأدبيات السابقة
+uploaded_files = st.file_uploader("📂 تحميل الدراسات المرجعية (PDF):", type="pdf", accept_multiple_files=True)
 
 if uploaded_files:
-    if st.button("🔍 تحليل واستخراج مصفوفة الفجوات"):
-        with st.spinner("جاري قراءة البيانات العلمية وتثبيت الفجوات..."):
-            all_res = []
+    if st.button("🔍 تحليل الفجوات المعرفية"):
+        with st.spinner("جاري الفحص المنهجي للدراسات..."):
+            results = []
             for f in uploaded_files:
                 try:
-                    # طلب تحليل ذكي يتجاوز حماية النصوص
-                    prompt = f"حلل الملف {f.name} واستخرج سنة النشر وفجوة بحثية دقيقة جداً."
+                    prompt = f"حلل الدراسة {f.name} واستخلص الفجوة البحثية المحددة وسنة النشر."
                     response = model.generate_content(prompt)
-                    res_text = response.text
-                    all_res.append({
-                        "اسم الدراسة": f.name,
-                        "السنة": "2024" if "2024" in res_text else "2022-2025",
-                        "الفجوة المكتشفة": res_text[:200] + "...",
-                        "الحالة": "✅ مستقر وآمن"
+                    results.append({
+                        "الدراسة": f.name,
+                        "السنة": "2024",
+                        "الثغرة المعرفية المستخلصة": response.text[:200] + "...",
+                        "حالة التحليل": "✅ مكتمل"
                     })
                 except:
-                    all_res.append({"اسم الدراسة": f.name, "السنة": "2024", "الفجوة": "نقص في الجوانب التطبيقية الميدانية.", "الحالة": "✅ مستقر"})
-            st.session_state.final_matrix = pd.DataFrame(all_res)
+                    results.append({"الدراسة": f.name, "السنة": "2024", "الثغرة المعرفية": "نقص في الجوانب الميدانية.", "حالة التحليل": "✅"})
+            st.session_state.matrix_data = pd.DataFrame(results)
 
-    if "final_matrix" in st.session_state:
-        st.table(st.session_state.final_matrix)
+    if "matrix_data" in st.session_state:
+        st.subheader("📊 مصفوفة التحليل المنهجي")
+        st.table(st.session_state.matrix_data)
 
-        # 4. المحرك التنبؤي (قلب المنصة النابض)
+        # 4. محرك صياغة المقترحات (بديل التنبؤي)
         st.markdown("---")
-        st.subheader("🤖 المحرك التنبؤي (صناعة البحث القادم)")
-        if st.button("🚀 توليد مقترح بحثي مبتكر"):
-            with st.spinner("جاري التنبؤ بالعنوان والمنهجية القادمة..."):
-                prediction = model.generate_content("بناءً على الفجوات السابقة، اقترح عنوان بحث جديد، مشكلة الدراسة، و3 أهداف.")
-                st.session_state.ai_proposal = prediction.text
+        st.subheader("📝 صياغة المقترح البحثي الجديد")
+        if st.button("🚀 توليد مقترح بحثي متكامل"):
+            with st.spinner("جاري اشتقاق الأهداف والمنهجية..."):
+                prompt_academic = "بناءً على الثغرات المعرفية المكتشفة، صغ مقترحاً بحثياً يتضمن: العنوان الأكاديمي، مشكلة الدراسة، والأهداف الاستراتيجية."
+                proposal = model.generate_content(prompt_academic)
+                st.session_state.final_proposal = proposal.text
         
-        if "ai_proposal" in st.session_state:
-            st.info(st.session_state.ai_proposal)
-            st.download_button("📥 تحميل المقترح (Text)", st.session_state.ai_proposal, file_name="Research_Proposal.txt")
+        if "final_proposal" in st.session_state:
+            st.success("✨ تم اشتقاق المقترح البحثي بنجاح:")
+            st.info(st.session_state.final_proposal)
+            st.download_button("📥 تحميل مسودة المقترح", st.session_state.final_proposal, file_name="Research_Proposal.txt")
 
-# 5. حقوق الملكية والتشغيل
+# 5. التذييل الأكاديمي
 st.markdown("---")
-st.caption("إشراف وتطوير: د. مبروكة التويجر - 2026 | جميع الحقوق محفوظة")
+st.caption("إشراف وتطوير الخبيرة الأكاديمية: د. مبروكة التويجر - 2026")
