@@ -2,6 +2,6 @@ streamlit
 pandas
 google-generativeai
 pdfplumber
-PyPdf
-Python-docx
+pypdf
+python-docx
 pyvis
