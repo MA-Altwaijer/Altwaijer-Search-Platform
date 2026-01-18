@@ -3,3 +3,4 @@ pandas
 google-generativeai
 pdfplumber
 PyPdf
+Python-docx
