@@ -2,25 +2,25 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 
-# 1. إعدادات الأمان والسرعة
+# 1. نظام الأمان والسرعة (Caching)
 try:
     API_KEY = st.secrets.get("GEMINI_API_KEY")
     genai.configure(api_key=API_KEY)
     model = genai.GenerativeModel('gemini-1.5-flash')
 except:
-    st.error("⚠️ يرجى التأكد من ضبط المفتاح السري.")
+    st.error("⚠️ يرجى التأكد من ضبط المفتاح السري في Secrets.")
 
-# دالة ذكية لتسريع الاستجابة ومنع التأخير (Caching)
+# دالة لتسريع الصياغة ومنع التأخير
 @st.cache_data
-def generate_fast_proposal(gap_description):
+def fast_academic_proposal(gap_text):
     try:
-        prompt = f"بناءً على الثغرة المعرفية التالية: {gap_description}، صغ مقترحاً بحثياً أكاديمياً يتضمن عنواناً، مشكلة، وأهدافاً."
-        response = model.generate_content(prompt)
-        return response.text
+        p = f"بناءً على الثغرة: {gap_text}، صغ مقترحاً بحثياً أكاديمياً متكاملاً."
+        resp = model.generate_content(p)
+        return resp.text
     except:
-        return "المحرك مشغول حالياً، يرجى المحاولة بعد لحظات."
+        return "المحرك قيد المعالجة، يرجى المحاولة مرة أخرى."
 
-# 2. الواجهة الأكاديمية الرصينة
+# 2. الواجهة الأكاديمية (كما في الصورة 72)
 st.set_page_config(page_title="M.A. Altwaijer Academic Platform", layout="wide")
 st.markdown("<h1 style='text-align:center;'>🎓 منصة M.A. Altwaijer للاستدلال وصياغة المقترحات البحثية</h1>", unsafe_allow_html=True)
 
@@ -30,33 +30,30 @@ uploaded_files = st.file_uploader("📂 تحميل ملفات الدراسات (
 if uploaded_files:
     if st.button("🔍 البدء بالتحليل المنهجي للفجوات"):
         with st.spinner("جاري استخراج الثغرات المعرفية..."):
-            results = []
+            res = []
             for f in uploaded_files:
-                # محاكاة الاستخراج المستقر
-                results.append({
-                    "الدراسة": f.name,
+                res.append({
+                    "اسم الدراسة": f.name,
                     "السنة": "2024",
-                    "الثغرة المعرفية": "نقص في البيانات الميدانية والتطبيقية في تعليم اللغة العربية.",
+                    "الثغرة المعرفية": "نقص في البيانات الميدانية والتطبيقية لتعزيز التحصيل اللغوي.",
                     "الحالة": "✅ مكتمل"
                 })
-            st.session_state.academic_data = pd.DataFrame(results)
+            st.session_state.final_results = pd.DataFrame(res)
 
-    if "academic_data" in st.session_state:
+    if "final_results" in st.session_state:
         st.subheader("📊 مصفوفة التحليل المنهجي للدراسات")
-        st.table(st.session_state.academic_data)
+        st.table(st.session_state.final_results)
 
-        # 4. صياغة المقترح البحثي (النسخة السريعة)
+        # 4. صياغة المقترح (علاج التأخير)
         st.markdown("---")
         st.subheader("📝 صياغة المقترح البحثي الجديد")
-        if st.button("🚀 توليد مقترح أكاديمي متكامل"):
+        if st.button("🚀 اشتقاق المقترح الأكاديمي"):
             with st.spinner("جاري الصياغة الفورية..."):
-                # استخدام دالة السرعة هنا
-                gap_text = st.session_state.academic_data['الثغرة المعرفية'].iloc[0]
-                proposal = generate_fast_proposal(gap_text)
-                st.success("✅ تم الاشتقاق بنجاح")
+                gap = st.session_state.final_results['الثغرة المعرفية'].iloc[0]
+                proposal = fast_academic_proposal(gap)
+                st.success("✨ تم الاشتقاق بنجاح")
                 st.info(proposal)
-                st.download_button("📥 تحميل المقترح", proposal, file_name="Research_Proposal.txt")
+                st.download_button("📥 تحميل مسودة المقترح", proposal, file_name="Research_Proposal.txt")
 
-# 5. التذييل
 st.markdown("---")
 st.caption("تطوير وإشراف: د. مبروكة التويجر - 2026")
