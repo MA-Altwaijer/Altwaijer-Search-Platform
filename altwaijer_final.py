@@ -2,39 +2,41 @@ import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
-# محاولة الربط بأكثر من اسم لضمان النجاح
-api_key = None
-if "GEMINI_API_KEY" in st.secrets:
-    api_key = st.secrets["GEMINI_API_KEY"]
-elif "api_key" in st.secrets:
-    api_key = st.secrets["api_key"]
-
-if api_key:
-    try:
-        genai.configure(api_key=api_key)
-        # استخدام الموديل الأكثر استقراراً لتجنب خطأ 404
+# الربط الآمن باستخدام المفتاح من Secrets
+try:
+    if "GEMINI_API_KEY" in st.secrets:
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        # الحل لخطأ 404: استخدام النموذج بدون بادئة 'models/'
         model = genai.GenerativeModel('gemini-pro')
-    except Exception as e:
-        st.error(f"خطأ في إعداد المحرك: {e}")
-else:
-    st.warning("⚠️ لم يتم العثور على المفتاح السري في إعدادات Secrets")
+    else:
+        st.error("⚠️ يرجى التأكد من إضافة المفتاح في Secrets باسم GEMINI_API_KEY")
+except Exception as e:
+    st.error(f"عطل في المحرك: {e}")
 
-st.set_page_config(page_title="Altwaijer Hub", layout="wide")
-st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
+st.set_page_config(page_title="Altwaijer Academic Hub", layout="wide")
+st.title("🏛️ منصة M.A. Altwaijer للتميز والابتكار")
 
-# واجهة رفع الملفات
-files = st.file_uploader("📂 ارفعي مراجعك (PDF):", type="pdf", accept_multiple_files=True)
+# دالة استخراج النص من الأبحاث المرفوعة
+def get_pdf_text(files):
+    text = ""
+    for f in files:
+        reader = PdfReader(f)
+        for page in reader.pages[:3]: # تحليل أول 3 صفحات للدقة
+            text += page.extract_text()
+    return text
 
-if files and api_key:
-    if st.button("🔍 تنفيذ التحليل الذكي"):
-        with st.spinner("⏳ جاري استخلاص القيمة البحثية..."):
-            text = ""
-            reader = PdfReader(files[0])
-            for page in reader.pages[:5]:
-                text += page.extract_text()
+files = st.file_uploader("📂 ارفعي المراجع (PDF):", type="pdf", accept_multiple_files=True)
+
+if files:
+    if st.button("🔍 تنفيذ التحليل الذكي الآن"):
+        with st.spinner("⏳ جاري محاورة المراجع واستخلاص القيمة البحثية..."):
+            context = get_pdf_text(files)
+            # أمر ذكي (Prompt) بأسلوب SciSpace
+            prompt = f"حلل هذا المحتوى الأكاديمي: {context[:5000]} واقترح 3 عناوين بحثية مبتكرة وفجوة بحثية واحدة."
             
-            # أمر صريح للذكاء الاصطناعي باللغة العربية
-            prompt = f"بناءً على هذا البحث العربي: {text[:5000]}، اقترح 3 عناوين بحثية مبتكرة."
-            response = model.generate_content(prompt)
-            st.success("✅ النتائج:")
-            st.write(response.text)
+            try:
+                response = model.generate_content(prompt)
+                st.success("✅ النتائج المستخلصة:")
+                st.write(response.text)
+            except Exception as e:
+                st.error("المحرك يحتاج لتحديث في الإعدادات، يرجى إعادة التشغيل.")
