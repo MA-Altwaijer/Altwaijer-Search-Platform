@@ -1,4 +1,4 @@
-ججimport streamlit as st
+import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
@@ -39,3 +39,4 @@ if search_button:
             response = model.generate_content(prompt)
             st.success("✅ النتائج:")
             st.write(response.text)
+
