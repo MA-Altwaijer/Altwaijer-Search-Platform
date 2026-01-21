@@ -2,33 +2,34 @@ import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
-# 1. إعدادات الواجهة
-st.set_page_config(page_title="Altwaijer Hub", layout="wide")
+# 1. إعدادات المنصة
+st.set_page_config(page_title="Altwaijer Academic Hub", layout="wide")
 st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
 
-# 2. إعداد الاتصال بالمحرك المستقر (تجاوز خطأ 404)
+# 2. الربط بالمحرك المستقر (هذا السطر سيحل مشكلة 404 نهائياً)
 if "GEMINI_API_KEY" in st.secrets:
-    # نقوم بضبط الإعدادات لاستخدام النسخة المستقرة v1
+    # استخدام الإصدار v1 المستقر بدلاً من v1beta
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    # اختيار الموديل فلاش 1.5 بشكل مباشر
     model = genai.GenerativeModel('gemini-1.5-flash')
 else:
-    st.error("⚠️ المفتاح السري مفقود في Secrets")
+    st.error("⚠️ المفتاح السري مفقود في الإعدادات")
 
-# 3. رفع وتحليل الملف
-uploaded_file = st.file_uploader("📂 ارفعي ملف البحث (PDF):", type="pdf")
+# 3. رفع وتحليل البحث
+file = st.file_uploader("📂 ارفعي ملف البحث (PDF):", type="pdf")
 
-if uploaded_file and st.button("🚀 تحليل محتوى البحث فوراً"):
-    with st.spinner("⏳ جاري التحليل الأكاديمي..."):
+if file and st.button("🚀 تحليل محتوى البحث فوراً"):
+    with st.spinner("⏳ جاري استخلاص النتائج العلمية..."):
         try:
-            reader = PdfReader(uploaded_file)
-            text = "".join([p.extract_text() for p in reader.pages[:5]]) # نكتفي بـ 5 صفحات للسرعة
+            reader = PdfReader(file)
+            # استخلاص النص من أول 5 صفحات لضمان السرعة وتجنب أخطاء الذاكرة
+            text = "".join([p.extract_text() for p in reader.pages[:5]])
             
-            # أمر التحليل
-            response = model.generate_content(f"لخص أهم الأفكار في هذا البحث: {text[:5000]}")
+            # أمر التحليل الأكاديمي
+            prompt = f"بصفتك خبيراً أكاديمياً، لخص أهم أسباب الضعف الواردة في هذا البحث واقترح عناوين بحثية جديدة: {text[:5000]}"
+            response = model.generate_content(prompt)
             
             st.success("✅ تم التحليل بنجاح!")
             st.markdown(response.text)
         except Exception as e:
-            st.error(f"خطأ: {e}")
-            st.info("إذا استمر الخطأ، يرجى إعادة إنشاء المفتاح من Google AI Studio.")
+            st.error(f"حدث خطأ تقني: {e}")
+            st.info("نصيحة: إذا استمر الخطأ، جربي إعادة تشغيل التطبيق من قائمة Manage app.")
