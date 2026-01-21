@@ -1,63 +1,47 @@
 import streamlit as st
-import pandas as pd
 import google.generativeai as genai
-from docx import Document
-from io import BytesIO
 from pypdf import PdfReader
 
-# 1. الربط الآمن بخزنة الأسرار (هذا ما ينقص المنصة الآن)
+# 1. الربط الآمن بخزنة الأسرار (لإصلاح خطأ NotFound)
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-pro')
-except:
-    st.error("⚠️ يرجى التأكد من ضبط المفتاح السري في إعدادات Secrets")
+    # استخدام النموذج المحدث
+    model = genai.GenerativeModel('gemini-1.5-flash') 
+except Exception as e:
+    st.error("⚠️ تأكدي من حفظ المفتاح في شاشة Secrets باسم GEMINI_API_KEY")
 
 st.set_page_config(page_title="Altwaijer Hub", layout="wide")
 st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
 
-# دالة استخراج النص من الـ PDF المرفوع
+# دالة استخراج النص من المراجع العربية
 def extract_text(files):
-    all_text = ""
+    text = ""
     for f in files:
         reader = PdfReader(f)
-        for page in reader.pages[:3]: # قراءة أول 3 صفحات للسرعة والدقة
-            all_text += page.extract_text()
-    return all_text
+        for page in reader.pages[:5]: # تحليل أول 5 صفحات لضمان الدقة
+            text += page.extract_text()
+    return text
 
-# واجهة المستخدم
+# الواجهة كما تظهر في صورتك
 st.sidebar.header("🎯 مسار بناء البحث")
-step = st.sidebar.radio("المراحل المنهجية:", ["1. تحديد العنوان", "2. صياغة الإطار النظري", "3. تحميل المسودة"])
+step = st.sidebar.radio("المراحل المنهجية:", ["تحديد العنوان", "صياغة الإطار النظري", "تحميل المسودة"])
 
-files = st.file_uploader("📂 ارفعي المراجع (PDF):", type="pdf", accept_multiple_files=True)
+files = st.file_uploader("(PDF) ارفعي المراجع :", type="pdf", accept_multiple_files=True)
 
 if files:
-    with st.spinner("⏳ جاري تحليل المحتوى العلمي..."):
-        context = extract_text(files)
-        
-        if step == "1. تحديد العنوان":
-            st.subheader("💡 مقترحات عناوين بحثية ذكية:")
-            prompt = f"بناءً على هذا النص: {context[:4000]}، اقترح 3 عناوين بحثية مبتكرة ورصينة."
-            response = model.generate_content(prompt)
-            st.write(response.text)
+    if st.button("🚀 ابدأ التحليل الذكي الآن"):
+        with st.spinner("⏳ جاري استخراج القيمة البحثية من ملفاتك..."):
+            context = extract_text(files)
+            
+            if step == "تحديد العنوان":
+                st.subheader("💡 مقترحات عناوين بحثية ذكية:")
+                prompt = f"بناءً على الدراسات المرفقة: {context[:5000]}، اقترح 5 عناوين بحثية مبتكرة لها قيمة علمية مضافة."
+                response = model.generate_content(prompt)
+                st.info(response.text)
 
-        elif step == "2. صياغة الإطار النظري":
-            st.subheader("📝 صياغة أكاديمية مقترحة (APA):")
-            prompt = f"بناءً على الدراسات المرفقة: {context[:4000]}، اكتب فقرة إطار نظري تربط بين النتائج مع التوثيق."
-            response = model.generate_content(prompt)
-            st.session_state['theory'] = response.text
-            st.write(response.text)
-
-        elif step == "3. تحميل المسودة":
-            if 'theory' in st.session_state:
-                doc = Document()
-                doc.add_heading("مسودة الإطار النظري - د. مبروكة التويجر", 0)
-                doc.add_paragraph(st.session_state['theory'])
-                buffer = BytesIO()
-                doc.save(buffer)
-                st.download_button("📥 تحميل ملف Word المنسق", buffer.getvalue(), "Altwaijer_Draft.docx")
-            else:
-                st.warning("يرجى الانتقال للمرحلة الثانية أولاً لتوليد النص.")
-
-st.markdown("---")
-st.caption("إشراف وتطوير: د. مبروكة التويجر - 2026")
+            elif step == "صياغة الإطار النظري":
+                st.subheader("📝 صياغة أكاديمية مقترحة:")
+                prompt = f"حلل الدراسات التالية واكتب إطاراً نظرياً مترابطاً: {context[:5000]}"
+                response = model.generate_content(prompt)
+                st.write(response.text)
