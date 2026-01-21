@@ -2,42 +2,36 @@ import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
-# 1. تهيئة الصفحة
+# 1. الإعدادات الأساسية
 st.set_page_config(page_title="Altwaijer Hub", layout="wide")
+
+# 2. الربط المباشر (حل نهائي لخطأ 404)
+if "GEMINI_API_KEY" in st.secrets:
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    # نستخدم gemini-1.5-flash كاسم أساسي بدون إصدارات بيتا
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    st.error("⚠️ المفتاح السري مفقود")
+
 st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
 
-# 2. ربط المحرك (الطريقة المستقرة 100%)
-try:
-    if "GEMINI_API_KEY" in st.secrets:
-        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        # الحل لخطأ 404: ننادي الموديل باسمه المجرد المستقر
-        model = genai.GenerativeModel('gemini-pro')
-    else:
-        st.error("⚠️ المفتاح السري مفقود من الإعدادات")
-except Exception as e:
-    st.error(f"⚠️ خطأ في المحرك: {e}")
+# 3. التحليل الأكاديمي
+file = st.file_uploader("📂 ارفعي مرجعاً واحداً (PDF) للتجربة:", type="pdf")
 
-# 3. رفع وتحليل المراجع
-files = st.file_uploader("📂 ارفعي مراجعك (PDF):", type="pdf")
-
-if files:
-    if st.button("🚀 تنفيذ التحليل العلمي"):
-        with st.spinner("⏳ جاري قراءة المراجع..."):
+if file:
+    if st.button("🚀 ابدأ التحليل الآن"):
+        with st.spinner("⏳ جاري استخلاص القيمة البحثية..."):
             try:
-                # استخراج النص
-                reader = PdfReader(files)
+                # قراءة النص
+                reader = PdfReader(file)
                 text = ""
-                for page in reader.pages[:10]:
-                    content = page.extract_text()
-                    if content: text += content
+                for page in reader.pages[:5]:
+                    text += page.extract_text()
                 
-                # إرسال النص للمحرك
-                if text:
-                    prompt = f"بناءً على هذا البحث: {text[:7000]}، اقترح 5 عناوين بحثية مبتكرة."
-                    response = model.generate_content(prompt)
-                    st.success("✅ النتائج المستخلصة:")
-                    st.write(response.text)
-                else:
-                    st.error("❌ لم نتمكن من قراءة نص من الملف، تأكدي أنه ليس صورة.")
+                # إرسال المحتوى
+                response = model.generate_content(f"حلل هذا النص الأكاديمي العربي واقترح عناوين بحثية: {text[:8000]}")
+                
+                st.success("✅ النتائج:")
+                st.markdown(response.text)
             except Exception as e:
-                st.error(f"❌ حدث خطأ أثناء المعالجة: {e}")
+                st.error(f"حدث خطأ: {e}")
