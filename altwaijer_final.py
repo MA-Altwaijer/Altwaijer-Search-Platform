@@ -2,41 +2,41 @@ import streamlit as st
 import google.generativeai as genai
 from pypdf import PdfReader
 
-st.set_page_config(page_title="Altwaijer Hub", layout="wide")
+# 1. إعداد الواجهة
+st.set_page_config(page_title="Altwaijer Academic Hub", layout="wide")
 
-# محاولة الربط بالمحرك
-api_key = st.secrets.get("GEMINI_API_KEY")
-model = None
-if api_key:
+# 2. تشغيل المحرك الذكي
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
     genai.configure(api_key=api_key)
+    # استخدام الإصدار المستقر والمدعوم عالمياً
     model = genai.GenerativeModel('gemini-1.5-flash')
+except Exception as e:
+    st.error(f"خطأ في الاتصال بالمحرك: {e}")
 
 st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
 
-# القائمة الجانبية
-task = st.sidebar.radio("المهمة:", ["اقتراح عناوين بحثية", "استخراج الفجوة البحثية"])
-
-# رفع الملفات
+# 3. واجهة رفع الملفات والتحليل
 files = st.file_uploader("📂 ارفعي المراجع (PDF):", type="pdf", accept_multiple_files=True)
 
-# جعل الزر يظهر دائماً (لحل مشكلة الاختفاء)
-search_button = st.button("🚀 ابدأ التحليل العميق الآن")
-
-if search_button:
-    if not files:
-        st.warning("⚠️ يرجى رفع ملفات PDF أولاً ليتمكن المحرك من تحليلها.")
-    elif not model:
-        st.error("⚠️ المحرك غير متصل، يرجى التحقق من المفتاح السري في Secrets.")
-    else:
-        with st.spinner("⏳ جاري استخلاص القيمة البحثية..."):
+# زر البحث يظهر دائماً الآن
+if st.button("🚀 ابدأ التحليل العميق الآن"):
+    if files:
+        with st.spinner("⏳ جاري تحليل مراجعك واستخلاص النتائج..."):
+            # استخراج النص
             text = ""
-            for f in files:
-                reader = PdfReader(f)
-                for page in reader.pages[:10]:
-                    text += page.extract_text()
+            reader = PdfReader(files[0])
+            for page in reader.pages[:10]:
+                text += page.extract_text()
             
-            prompt = f"أنت خبير أكاديمي، حلل هذا النص: {text[:8000]} واقترح مخرجات بحثية رصينة."
-            response = model.generate_content(prompt)
-            st.success("✅ النتائج:")
-            st.write(response.text)
-
+            # أمر التحليل (بأسلوب سايس بيس)
+            prompt = f"حلل هذا البحث العربي: {text[:8000]} واقترح 5 عناوين بحثية مبتكرة وفجوة بحثية واحدة."
+            
+            try:
+                response = model.generate_content(prompt)
+                st.success("✅ النتائج:")
+                st.markdown(response.text)
+            except Exception as e:
+                st.error(f"حدث خطأ أثناء معالجة البيانات: {e}")
+    else:
+        st.warning("⚠️ يرجى رفع ملف واحد على الأقل للبدء.")
