@@ -4,7 +4,7 @@ from pypdf import PdfReader
 
 # 1. إعدادات الواجهة
 st.set_page_config(page_title="Altwaijer Academic Hub", layout="wide")
-st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛️ منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center; color: #1E3A8A;'>🏛 منصة M.A. Altwaijer للتميز والابتكار</h1>", unsafe_allow_html=True)
 
 # 2. وظيفة التحليل عبر OpenRouter (التي بدأتِها في الصورة 61)
 def analyze_with_openrouter(text, api_key):
